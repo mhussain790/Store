@@ -1,5 +1,5 @@
 # 3 classes - Product, Customer, and Store
-# All data members are privata and accessed through get/set methods
+# All data members are private and accessed through get/set methods
 
 class Product:
 
@@ -88,8 +88,8 @@ class Store:
             if product_id == products.get_product_id():
                 return products.get_title()
                 found = True
-            if not found:
-                return None
+        if not found:
+            return None
 
     def lookup_member_from_id(self, customer_id):
         found = False
@@ -97,8 +97,8 @@ class Store:
             if customer_id == member.get_customer_id():
                 return member.get_name()
                 found = True
-            elif not found:
-                return None
+        if not found:
+            return None
 
     def product_search(self, search_string):
         # Initialize empty list to store case insensitive products
@@ -121,27 +121,18 @@ class Store:
         return sorted_list
 
     def add_product_to_member_cart(self, product_id, customer_id):
-        for item in self._inventory:
-            if product_id == item.get_product_id():
-                print("Product found " + item.get_title())
 
-                for member in self._membership:
-                    if customer_id == member.get_customer_id():
-                        print("Member ID found")
+        for item, member in zip(self._inventory, self._membership):
+            if product_id != item.get_product_id():
+                return "Product ID not found"
+            elif customer_id != member.get_customer_id():
+                return "Member ID not found"
+            elif item.get_quantity_available() > 0:
+                member.add_product_to_cart(item)
+                return "Product added to cart"
+            else:
+                return "Product out of stock"
 
-                        if item.get_quantity_available() > 0:
-                            member.add_product_to_cart(item)
-                            print("Product added to cart!")
-
-                        else:
-                            print("Product out of stock!")
-
-                    elif item not in self._membership:
-                        print("Member ID NOT found")
-            elif item not in self._inventory:
-                print("Product not found")
-
-    # TODO: FINISH METHOD
     def check_out_member(self, customer_id):
         try:
             cost_of_products = 0
@@ -155,37 +146,34 @@ class Store:
                             products.decrease_quantity()
                     if member.is_premium_member() is True:
                         total_cost = cost_of_products + shipping_cost
-                        print("Total cost for premium member is " + str(total_cost))
+                        return total_cost
                     else:
                         shipping_cost = cost_of_products * 0.07
                         total_cost = cost_of_products + shipping_cost
-                        print("Total cost is " + str(total_cost))
+                        return total_cost
                 else:
                     raise InvalidCheckoutError
 
         except InvalidCheckoutError:
-            print("ERROR: There was an issue checking out!")
+            return "ERROR: There was an issue checking out!"
 
 
-# TODO: MAIN METHOD
 def main():
-    myStore = Store()
-    prod = Product(1001, "mango", "i like mangos", 35, 10)
+    my_store = Store()
+    prod = Product(1001, "mango", "tropical very nice mangos", 35, 10)
     prod_2 = Product(1002, "orange", "juicy orange", 45, 2)
     prod_3 = Product(1003, "apple", "green apple", 55, 1)
     prod_4 = Product(1004, "MANGO", "large mango", 65, 3)
     cust = Customer("test", 3534, False)
 
-    myStore.add_product(prod)
-    myStore.add_product(prod_2)
-    myStore.add_product(prod_3)
-    myStore.add_product(prod_4)
-    myStore.add_member(cust)
+    my_store.add_product(prod)
+    my_store.add_product(prod_2)
+    my_store.add_product(prod_3)
+    my_store.add_product(prod_4)
+    my_store.add_member(cust)
 
-    return myStore.check_out_member(3534)
+    return my_store.check_out_member(3534)
 
 
 if __name__ == '__main__':
     main()
-
-# TODO: UNIT TEST
